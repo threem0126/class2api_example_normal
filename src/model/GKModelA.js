@@ -1,7 +1,22 @@
-import {GKSUCCESS} from 'class2api'
+/*
+    model文件夹中存在的都是需暴露接口的业务层逻辑类，可以理解为"对外开放"
+ */
+
+
+import {GKSUCCESS,modelSetting} from 'class2api'
 import {GKErrors} from 'class2api/gkerrors'
 import Base from './../model_private/Base'
 
+@modelSetting({
+    __Auth:async ({req})=> {
+        console.log("Do Authing of GKModelA ....")
+        //TODO:验证req请求中的身份信息，比如解析header中的token信息
+        /*
+         */
+        //最终返回Boolean
+        return {uID:1,username:"huangyong",age:23}
+    }
+})
 class GKModelA {
     constructor() {
         throw '静态业务功能类无法实例化'
@@ -18,8 +33,13 @@ class GKModelA {
      * @returns {Promise.<{message: string}>}
      */
     static async getArticle({uID, name}) {
-        console.log(GKErrors._SERVER_ERROR('错误1'))
-        return {message: `getArticle.${name}, user.uID = ${uID}, ${Base.TestInside({name})}`}
+        //..模拟一个错误信息
+        // throw GKErrors._SERVER_ERROR('错误1')
+        //..
+        return {
+            message: `getArticle.${name}, user.uID = ${uID}, ${ Base.TestInside({name}) }`,
+            article: require('fixture/article.json')
+        }
     }
 
     static async editArticle({aID}) {

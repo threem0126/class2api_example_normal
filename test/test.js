@@ -6,6 +6,8 @@ JSON.stringifyline = function (Obj) {
     return JSON.stringify(Obj, null, 2)
 }
 
+let isDev = (process.env.NODE_ENV ==="development" || !process.env.NODE_ENV)
+
 let _run = {
     accounts: {
         user1: {
@@ -17,13 +19,12 @@ let _run = {
     }
 }
 
-const remote_api = process.env.ONLINE==='1'? `https://comment_api_test.gankao.com`
-    :(process.env.ONLINE==='2'? `https://comment_api.gankao.com`
-        :`http://127.0.0.1:3002`);
+const remote_api = isDev ? `http://127.0.0.1:3002`:`其他环境的接口发布地址`;
+
 //配置远程请求endpoint
 setApiRoot(remote_api)
 
-describe('评论系统', function () {
+describe('接口网关', function () {
 
     //region after 在本区块的所有测试用例之后执行
     after(function () {
@@ -31,7 +32,7 @@ describe('评论系统', function () {
     });
     //endregion
 
-    it('/a2/hello 以get方式请求', async () => {
+    it('/a2/hello（以get方式请求）', async () => {
         let response = await WebInvokeHepler(_run.accounts.user1, 'get')(
             '/a2/hello',
             {name: "haungyong"}
@@ -41,8 +42,8 @@ describe('评论系统', function () {
         message.lastIndexOf('haungyong').should.be.above(-1)
     })
 
-    it('/gkmodela/getArticle', async () => {
-        let response = await WebInvokeHepler(_run.accounts.user1)('/gkmodela/getArticle', {name:"haungyong"})
+    it('/a2/getArticle', async () => {
+        let response = await WebInvokeHepler(_run.accounts.user1)('/a2/getArticle', {name:"haungyong"})
         let {err, result} = response
         let {message} = result
         message.lastIndexOf('getArticle').should.be.above(-1)

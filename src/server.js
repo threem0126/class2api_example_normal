@@ -1,22 +1,19 @@
 import {createServer} from 'class2api'
 import GKModelA from './model/GKModelA'
-import path from 'path'
-import express from 'express'
+import _config from "./config.js" ;
 
 let node_env = process.env.NODE_ENV || "development"
-let port = process.env.PORT || 3002;
+let port = process.env.PORT || _config.PORT || 3002
+let isDev = (node_env === "development")
 
 //在API方法执行前
 const beforeCall = async ({req, params, modelSetting})=> {
     let {__Auth} = modelSetting
-    if(process.env.NODE_ENV === "development") {
-        console.log(`beforeCall [${ req.originalUrl }]:....${( typeof __Auth )}`)
-        console.log('params:....' + JSON.stringify(params))
-        console.log('req.header:token....' + JSON.stringify(req.header('token')))
-        console.log('req.header:jwtoken....' + JSON.stringify(req.header('jwtoken')))
-        console.log('req.cookies:....' + JSON.stringify(req.cookies))
+    if (isDev) {
+        console.log(`[${ req.originalUrl }] beforeCall: `)
+        console.log('==> invoke params:....' + JSON.stringify(params))
+        console.log('==> req.cookies:....' + JSON.stringify(req.cookies))
     }
-
     //根据类的__Auth配置来进行身份验证,具体的验证逻辑由类的修饰器配置决定，这里不进行类静态方法的权限认证
     if (__Auth) {
         let userInfo = await __Auth({req})
@@ -27,12 +24,10 @@ const beforeCall = async ({req, params, modelSetting})=> {
 
 //在API方法执行后
 const afterCall = async ({req,result})=> {
-    // let {err, result} = result
-    let {__user} = req
-    if (__user) {
-        result.__user = __user
-    }
-    console.log(`afterCall... [${ req.originalUrl }] result: ${ JSON.stringify(result) }`)
+    /*
+    TODO:在API方法执行完成后，进行的拦截处理，可以做日志记录、对结果result的二次加工处理等
+     */
+    console.log(`[${ req.originalUrl }] afterCall: ${ JSON.stringify(result) }`)
     return result
 }
 
@@ -43,29 +38,22 @@ createServer({
         apiroot: '/',
         cros: true,
     },
-    // 将哪些类映射到API，可以定义路径别名
-    modelClasses:[GKModelA, {model:GKModelA, as:'a2'}],
+    // 将GKModelA类映射路径取别名a2
+    modelClasses:[{model:GKModelA, as:'a2'}],
     beforeCall,
     afterCall,
     custom:(expressInstence)=> {
-        //定义静态资源路径，所有的静态类型文件都会转向这个位置
-        let staticPath = path.join(__dirname, "./../static")
-        console.log(`staticPath：${staticPath}`)
-        expressInstence.use(express.static(staticPath))
+        //TODO：对express对象的扩展设置...
         return expressInstence
     }
 }).then((server)=>{
-
     //开始监听指定的端口
     server.listen(port, "0.0.0.0", function onStart(err) {
-        if (err) {
-            console.log(err);
-        }
-        console.info("==> 🌎 Listening on port %s. Open up http://0.0.0.0:%s/ in your browser.", port, port);
+        if (err)  console.log(err);
+        console.info("==> 🌎 Listening on http://0.0.0.0:%s/. wait request ...", port);
+        if(isDev) console.info("==> For Test: $ mocha test/test.run.js");
     });
 
 }).catch((error)=>{
     setTimeout(()=>{throw  error})
 })
-
-
