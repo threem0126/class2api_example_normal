@@ -8,6 +8,8 @@ JSON.stringifyline = function (Obj) {
 
 let isDev = (process.env.NODE_ENV ==="development" || !process.env.NODE_ENV)
 
+//跨用例的"全局"变量，保存测试期间的全局共享数据
+//在用例执行过程中，也可以在上文用例中暂存数据在_run对象里，然后在下文用例中获取
 let _run = {
     accounts: {
         user1: {
@@ -28,6 +30,7 @@ describe('接口网关', function () {
 
     //region after 在本区块的所有测试用例之后执行
     after(function () {
+        //将所有标记了ApiDesc实参的接口所执行的结果，汇总保存到Api文档
         save2Doc({save2File:'api.MD'})
     });
     //endregion
