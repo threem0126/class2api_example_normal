@@ -13,7 +13,7 @@ import Base from './../model_private/Base'
         //TODO:验证req请求中的身份信息，比如解析header中的token信息
         /*
          */
-        //最终返回Boolean
+        //最终返回用户信息对象（具体数据结构因项目而异）
         return {uID:1,username:"huangyong",age:23}
     }
 })
