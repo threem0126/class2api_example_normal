@@ -1,7 +1,10 @@
+最常用的API网关Demo（不带数据库层）
+ 
+在 $ Class2api init 初始化时被拉取
  
  #开发环境 #
  `
- $ NODE_ENV=development REDIS_SESSION=1 node ./src/index.js  
+ $ npm run start 
  $ pm2 ecosystem/ecosystem_dev.json
  `
  #测试环境 #
@@ -24,5 +27,5 @@ cd /usr/local/redis && src/redis-cli
 #nginx
 重启 pkill -9 nginx
 
-$ npm i class2api@1.3.6 --registry=https://registry.npm.taobao.org   
+$ npm i class2api@latest --registry=https://registry.npm.taobao.org   
 
